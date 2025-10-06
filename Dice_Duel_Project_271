@@ -1,0 +1,135 @@
+#include <iostream>
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
+
+using namespace std;
+/* the variables will be initiated as the code goes on since it is difficult to predict and list 
+all at the beginning*/ 
+
+int rolldie () {
+    return rand() % 6 + 1; //generate a number between 1 and 6// 
+}
+int main () {
+    srand(time(NULL)); //random number generator//
+    int player_score = 0, computer_score = 0; // Scores for player and computer
+    int target_score = 20, player_turn = 0;
+    
+    cout << "Welcome to Dice Duel!\U0001F47E  \U0001F480  \U0001F608 \n";
+    cout << "In this game, your task is to be the first to reach 20 points. \U0001F3AF\n";
+    cout << "Here are the rules:\n";
+    cout << "1. You and the computer will take turns rolling two dice. \U0001F3B2  \U0001F3B2\n";
+    cout << "2. Your score is the sum of the two dice you roll.\n";
+    cout << "3. Special Rules:\n";
+    cout << "   - Double Sixes \U0001F389: If you roll two 6's, you get a bonus roll!\n";
+    cout << "   - Snake Eyes \U0001F480: If you roll two 1's, you lose half your score.\n";
+    cout << "   - Lucky Roll \U0001F929: Any doubles (e.g., 2-2, 3-3) give you an extra turn and 5 bonus points.\n";
+    cout << "   - Target Guessing \U0001F9E0: If you roll an even number, guess whether your next roll will be odd or even. If you're right, you double your points!\n";
+    cout << "4. The game continues until one player reaches 20 points or more! \U0001F3C6\n";
+    cout << "Let's get started! \U0001F389\n\n";
+    cout << "First to score 20 points wins. Special rules apply. Let's begin! \U0001F44A\n";
+    
+    //starting an infinite loop//
+    while (true) {
+        cout << (player_turn ? "\nYour turn to roll the dice:\n" : "\nComputer's turn to roll the dice:\n");
+        if (player_turn) {
+            char proceed;
+            cout<<"Press r to roll the dice \U0001F3B2  ";
+            cin>>proceed;
+            if (proceed != 'r' && proceed != 'R') {
+                cout<<"Invalid entry, your turn will be skipped \n ";
+                player_turn = false; //this will ensure due to invalid input player turn to be skipped
+                continue;
+            }
+           // Roll the dice, this is the part where the players turn is passed
+            int roll1 = rolldie();
+            int roll2 = rolldie();
+            int roll_sum = roll1 + roll2;
+            cout << "You rolled: " << roll1 << " and " << roll2 << " (Total: " << roll_sum << ")\n";
+            player_score += roll_sum;
+            
+            // Introducing the three special rules we discussed in instructions
+            if (roll1 == 6 && roll2 == 6) { // Double Six Bonus
+                cout << "Double Six! \U0001F389  You get a bonus roll! \U0001F3B2 \U0001F3B2\n";
+                player_score += rolldie() + rolldie(); // Bonus roll
+            }
+            if (roll1 == 1 && roll2 == 1) { // Snake Eyes Penalty
+                cout << "Snake Eyes! \U0001F40D You lose half of your score! \U0001F480\n";
+                player_score /= 2;
+            }
+            if (roll1 == roll2) { // Lucky Roll (Rolling Doubles)
+                cout << "Lucky Roll! \U0001F480  You get an extra turn and 5 bonus points! \U0001F929 \n";
+                player_score += 5;
+                continue; // Player gets another turn
+            }
+            
+            // Target Guessing (can only do this after you get an even sum)
+            if (roll_sum % 2 == 0) {
+                char guess;
+                int valid_guess = false;
+                
+                // Guessing whether or not the next roll is even or odd?
+                while (!valid_guess) {
+                    cout << "Can you guess the outcome of your next roll \U0001F914  (o for odd and e for even): ";
+                    cin >> guess;
+                    if (guess == 'o' || guess == 'e') {
+                        valid_guess = true; // Exit the loop if the input is valid 
+                    } else {
+                        cout << "Invalid input! Please enter 'o' for odd or 'e' for even. \U0001F633\n";
+                    }
+                }
+                // Check if the odd/even number is correct?
+                int next_roll = rolldie() + rolldie();
+                if ((next_roll % 2 == 0 && guess == 'e') || (next_roll % 2 != 0 && guess == 'o')) {
+                    cout << "Correct guess! \U0001F389  Your points for this roll are doubled: " << next_roll * 2 << "\n";
+                    player_score += next_roll * 2;
+                } else {
+                    cout << "Incorrect guess! \U0001F625  You lose 2 points.\n";
+                    player_score -= 2; //deducts two points if incorrect
+                }
+        }
+        // Checking if the player has won
+            if (player_score >= target_score) {
+                cout << "Congratulations! You reached 20 points! \U0001F3C6  You win! \U0001F389\n";
+                break;
+            }
+            player_turn = false; // This switches to computer's turn
+        } 
+        else { // Computer's turn
+            cout << "\nComputer's turn to roll the dice: \U0001F3B2  ";
+            
+        // Initiating and writing the code for computer's turn
+            int roll1 = rolldie();
+            int roll2 = rolldie();
+            int roll_sum = roll1 + roll2;
+            cout << "The computer rolled: " << roll1 << " and " << roll2 << " (Total: " << roll_sum << ")\n";
+            computer_score += roll_sum;
+            
+            // Applying same Special rules for computer
+            if (roll1 == 6 && roll2 == 6) {
+                cout << "Computer rolled double sixes! \U0001F389  Bonus roll!\n";
+                computer_score += rolldie() + rolldie(); // Bonus roll
+            }
+            if (roll1 == 1 && roll2 == 1) {
+                cout << "Computer rolled snake eyes! \U0001F640  Losing half of score! \U0001F480\n";
+                computer_score /= 2;
+            }
+
+            // Checking if the computer has won
+            if (computer_score >= target_score) {
+                cout << "Computer reached 20 points first! \U0001F608  The computer wins! \U0001F3C6\n";
+                cout << "You lost! \U0001F625  Better luck next time!\n";
+                break; //ending the loop
+            }
+            player_turn = true; // Switch back to player's turn
+        }
+
+        // Displaying current scores
+        cout << "Current Scores: You - " << player_score << " | Computer - " << computer_score << "\n\n";
+    }
+
+    return 0;
+}
+        
+        
+  
